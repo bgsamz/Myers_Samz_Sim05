@@ -2,6 +2,8 @@
 #ifndef PRGREAD_C
 #define PRGREAD_C
 
+// Accomplishes objective #1 by reformatting code to use cleaner include
+// statements and header files.
 #include "programReader.h"
 
 /*

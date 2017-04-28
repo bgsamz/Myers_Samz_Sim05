@@ -2,6 +2,8 @@
 #ifndef MAIN_C
 #define MAIN_C
 
+// Accomplishes objective #1 by reformatting code to use cleaner include
+// statements and header files.
 #include "main.h"
 
 /*
@@ -160,7 +162,7 @@ int main(int argc, char * argv[])
 /*
  * Goal #3 was to modify PCB and Action structures to be accessed using
  * a linked list, as opposed to an array.
- * 
+ *
  * Accomplishes goal #3 by taking the original structure, and converting
  * PCB and Action structures to work using a linked list. This is the first
  * part of implementing goal #3, other changes had to be made when accessing

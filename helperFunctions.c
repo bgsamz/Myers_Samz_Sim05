@@ -2,6 +2,8 @@
 #ifndef HELP_C
 #define HELP_C
 
+// Accomplishes objective #1 by reformatting code to use cleaner include
+// statements and header files.
 #include "helperFunctions.h"
 
 /*

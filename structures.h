@@ -1,3 +1,9 @@
+/*
+ * Objective #1 was to reformat all code to use header files that contained
+ * all necessary includes, functions, and constant definitions.
+ * This file accomplishes that goal, as can be seen below.
+ */
+
 // Make sure not to compile structures more than once
 #ifndef STRUCTURES_H
 #define STRUCTURES_H

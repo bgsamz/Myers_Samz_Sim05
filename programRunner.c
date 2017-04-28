@@ -2,6 +2,8 @@
 #ifndef PRGRUN_C
 #define PRGRUN_C
 
+// Accomplishes objective #1 by reformatting code to use cleaner include
+// statements and header files.
 #include "programRunner.h"
 
 /*
@@ -377,7 +379,6 @@ void runRR_P(struct PCB * programPCBs, int numPrograms, struct Config config)
 {
 
     struct PCB * currPro = programPCBs;
-//    struct PCB * prevPro = NULL;
     struct PCB * firstPro = programPCBs;
     char outputStr[128];
     int remCycles;
