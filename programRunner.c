@@ -87,6 +87,7 @@ void runFCFS_N(struct PCB * programPCBs, int numPrograms, struct Config config)
  */
 void runSJF_N(struct PCB * programPCBs, int numPrograms, struct Config config)
 {
+    // Accomplishes object #2, see sortPCB function.
     sortPCB( programPCBs, numPrograms, config );
 
     // Now that the programs are sorted, run them like FCFS-N
@@ -188,6 +189,11 @@ void runFCFS_P(struct PCB * programPCBs, int numPrograms, struct Config config)
     }
 }
 
+/*
+ * Goal to fix SRTF-P (goal #2), semi accomplished. SRTF-P still needs to be
+ * fixed by implementing the sortPCB function into the code, then running
+ * FCFS-N in the same general manner, looping and sorting each time.
+ */
 
 /*
  *  Name:        runSRTF_P
@@ -452,6 +458,11 @@ void runRR_P(struct PCB * programPCBs, int numPrograms, struct Config config)
 }
 
 /*
+ * Assists in accomplishing goal #2, this sort function is needed to
+ * ensure that SRTF-P is sorted and runs properly everytime.
+ */
+
+/*
  *  Name:        runAction
  *  Description: Runs a single action of a program. If the action is a start/end
  *               action, it placed the PCB into running or exit state. If the
@@ -608,7 +619,7 @@ int getProgramLength(struct PCB pcb)
 }
 
 //---------------------------
-// #2 Sort PCB using a linked 
+// #2 Sort PCB using a linked
 // list structure
 //---------------------------
 void sortPCB( struct PCB * programPCBs, int numPrograms, struct Config config )
@@ -647,7 +658,7 @@ void sortPCB( struct PCB * programPCBs, int numPrograms, struct Config config )
     }
 
     numPrograms--;
-    
+
     sortPCB(currPro, numPrograms, config);
 }
 
