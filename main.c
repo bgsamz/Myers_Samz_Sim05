@@ -165,12 +165,14 @@ struct PCB * convertToLinkedList(struct PCB * programPCBs, int numPrograms)
     struct Action * currentAction;
 
     firstPCB = &programPCBs[0];
+    firstPCB->prevPCB = NULL;
     currentPCB = firstPCB;
 
     for (count = 1; count < numPrograms; count++)
     {
         currentPCB->nextPCB = (struct PCB *) malloc(sizeof(struct PCB));
         currentPCB->nextPCB = &programPCBs[count];
+        currentPCB->nextPCB->prevPCB = currentPCB;
         currentPCB = currentPCB->nextPCB;
         currentPCB->nextPCB = NULL;
     }
@@ -182,6 +184,7 @@ struct PCB * convertToLinkedList(struct PCB * programPCBs, int numPrograms)
     {
         firstAction = &currentPCB->program[0];
         currentAction = firstAction;
+        currentPCB->processNum = firstAction->processNum;
 
         for (count = 1; count < currentPCB->numActions; count++)
         {
