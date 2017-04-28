@@ -137,99 +137,91 @@ void runSJF_N(struct PCB * programPCBs, int numPrograms, struct Config config)
  */
 void runFCFS_P(struct PCB * programPCBs, int numPrograms, struct Config config)
 {
+    struct PCB * currPro = programPCBs;
+    struct PCB * prevPro = NULL;
+    struct PCB * firstPro = programPCBs;
+    char outputStr[128];
 
-  int counter = 0;
-  int doneCount = 0;
-  int prevPro = -1;
-  int actionsCompleted[numPrograms];
-  struct PCB * currPro = (struct PCB *) malloc(sizeof(struct PCB));
-  char outputStr[128];
-
-  // Loop through each program and set it to ready state
-  for (counter = 0; counter < numPrograms; counter++)
-  {
-    actionsCompleted[counter] = 0;
-    strcpy(programPCBs[counter].state, "Ready");
-  }
-
-  memset(outputStr, '\0', 128);
-
-  // Output the ready message
-  strcat(outputStr, outputTime(config));
-  strcat(outputStr, " OS: All processes now set in READY state\n");
-  output(config, outputStr);
-
-  // While not all the programs are done
-  while (doneCount < numPrograms)
-  {
-
-    doneCount = 0;
-
-    // Loop through each program
-    for (counter = 0; counter < numPrograms; counter++)
+    // Loop through each program and set it to ready state
+    while (currPro != NULL)
     {
+        strcpy(currPro->state, "Ready");
+        currPro = currPro->nextPCB;
+    }
 
-      // Get the current program
-      currPro = &programPCBs[counter];
+    currPro = programPCBs;
 
-      // If it is in blocked state or exit state
-      if ((strcmp(currPro->state, "Blocked") != 0) &&
-          (strcmp(currPro->state, "Exit") != 0))
-      {
+    memset(outputStr, '\0', 128);
 
-        if (counter != prevPro)
+    // Output the ready message
+    strcat(outputStr, outputTime(config));
+    strcat(outputStr, " OS: All processes now set in READY state\n");
+    output(config, outputStr);
+
+    // While not all the programs are done
+    while (firstPro != NULL)
+    {
+        currPro = firstPro;
+        // Loop through each program
+        while (currPro != NULL)
         {
-          if (strcmp(programPCBs[prevPro].state, "Running") == 0)
-          {
+            // If it is not blocked state or exit state
+            if ((strcmp(currPro->state, "Blocked") != 0) &&
+                (strcmp(currPro->state, "Exit") != 0))
+            {
 
-          memset(outputStr, '\0', 128);
+                if ((prevPro == NULL) ||
+                    (prevPro->processNum != currPro->processNum))
+                {
+                    if ((prevPro != NULL) &&
+                        (strcmp(prevPro->state, "Running") == 0))
+                    {
 
-          // Output the ready message and set the program in ready state
-          strcat(outputStr, outputTime(config));
-          strcat(outputStr, outputProcessNum(config, intToString(counter)));
-          strcat(outputStr, " set in READY state\n");
-          output(config, outputStr);
+                        memset(outputStr, '\0', 128);
 
-          strcpy(programPCBs[prevPro].state, "Ready");
-          }
-          memset(outputStr, '\0', 128);
+                        // Output the ready message and set the program in ready state
+                        strcat(outputStr, outputTime(config));
+                        strcat(outputStr, outputProcessNum(config, intToString(prevPro->processNum)));
+                        strcat(outputStr, " set in READY state\n");
+                        output(config, outputStr);
 
-          // Output which program is selected
-          strcat(outputStr, "\n");
-          strcat(outputStr, outputTime(config));
-          strcat(outputStr, " OS: FCFS-P selects");
-          strcat(outputStr, outputProcessNum(config, intToString(counter)));
-          strcat(outputStr, "\n");
-          output(config, outputStr);
+                        strcpy(prevPro->state, "Ready");
+                    }
+                    memset(outputStr, '\0', 128);
 
-          memset(outputStr, '\0', 128);
+                    // Output which program is selected
+                    strcat(outputStr, "\n");
+                    strcat(outputStr, outputTime(config));
+                    strcat(outputStr, " OS: FCFS-P selects");
+                    strcat(outputStr, outputProcessNum(config, intToString(currPro->processNum)));
+                    strcat(outputStr, "\n");
+                    output(config, outputStr);
 
-          // Output the running state message
-          strcat(outputStr, outputTime(config));
-          strcat(outputStr, outputProcessNum(config, intToString(counter)));
-          strcat(outputStr, " set in RUNNING state\n");
-          output(config, outputStr);
+                    memset(outputStr, '\0', 128);
 
-          strcpy(currPro->state, "Running");
+                    // Output the running state message
+                    strcat(outputStr, outputTime(config));
+                    strcat(outputStr, outputProcessNum(config, intToString(currPro->processNum)));
+                    strcat(outputStr, " set in RUNNING state\n");
+                    output(config, outputStr);
+
+                    strcpy(currPro->state, "Running");
+                }
+
+                // Run an action of the program and add to the counter
+                runAction(currPro, currPro->program, config);
+                currPro->program = currPro->program->nextAction;
+                prevPro = currPro;
+                break;
+            }
+            currPro = currPro->nextPCB;
         }
 
-        // Run an action of the program and add to the counter
-        runAction(currPro, &currPro->program[actionsCompleted[counter]], config);
-        actionsCompleted[counter]++;
-        prevPro = counter;
-        break;
-      }
+        while ((firstPro != NULL) && (strcmp(firstPro->state, "Exit") == 0))
+        {
+            firstPro = firstPro->nextPCB;
+        }
     }
-
-    // For each program in exit state, add to the done counter
-    for (counter = 0; counter < numPrograms; counter++)
-    {
-      if (strcmp(programPCBs[counter].state, "Exit") == 0)
-      {
-        doneCount++;
-      }
-    }
-  }
 }
 
 
@@ -364,6 +356,15 @@ void runSRTF_P(struct PCB * programPCBs, int numPrograms, struct Config config)
   }
 }
 
+/*
+ * Completely rewritten implementation of runRR_P satisfies goal #4.
+ * Goal was to create more efficient code using the new linkedlist structure.
+ * This was done by modifying the original code to use a linked list as
+ * opposed to an array, and borrowing elements from the implementation of
+ * FCFS-P while writing.
+ * Goal #4 satisfied here.
+ */
+
 
 /*
  *  Name:        runRR_P
@@ -375,53 +376,49 @@ void runSRTF_P(struct PCB * programPCBs, int numPrograms, struct Config config)
 void runRR_P(struct PCB * programPCBs, int numPrograms, struct Config config)
 {
 
-    int count;
-    int remCycles;
-    struct Action currAct;
-    int progress[numPrograms];
-    int finished;
+    struct PCB * currPro = programPCBs;
+//    struct PCB * prevPro = NULL;
+    struct PCB * firstPro = programPCBs;
     char outputStr[128];
+    int remCycles;
 
-    // Fill the array which keep track of program progress with zeros
-    for (count = 0; count < numPrograms; count++)
+    // Loop through each program and set it to ready state
+    while (currPro != NULL)
     {
-        progress[count] = 0;
+        strcpy(currPro->state, "Ready");
+        currPro = currPro->nextPCB;
     }
 
-    output(config, "\n");
+    currPro = programPCBs;
 
-    // Set that program are not done running
-    finished = 0;
+    memset(outputStr, '\0', 128);
 
-    while(finished == 0)
+    // Output the ready message
+    strcat(outputStr, outputTime(config));
+    strcat(outputStr, " OS: All processes now set in READY state\n");
+    output(config, outputStr);
+
+    while(firstPro != NULL)
     {
-
-        // Assume that all programs are finished till shown otherwise
-        finished = 1;
-
         // Loop through each program
-        for (count = 0; count < numPrograms; count++)
+        while (currPro != NULL)
         {
-
             // If the program has not finished running or not blocked
-            if (strcmp(programPCBs[count].state, "Exit") != 0)
+            if ((strcmp(currPro->state, "Blocked") != 0) &&
+                (strcmp(currPro->state, "Exit") != 0))
             {
-
-                // Set that there are unfinished programs
-                finished = 0;
-
                 // Place the program back into running state, unless its new
-                if (strcmp(programPCBs[count].state, "New") != 0)
+                if (strcmp(currPro->state, "Ready") != 0)
                 {
                     memset(outputStr, '\0', 128);
 
                     strcat(outputStr, outputTime(config));
                     strcat(outputStr, " OS:");
-                    strcat(outputStr, outputProcessNum(config, intToString(count)));
+                    strcat(outputStr, outputProcessNum(config, intToString(currPro->processNum)));
                     strcat(outputStr, "set in Running state\n");
                     output(config, outputStr);
 
-                    strcpy(programPCBs[count].state, "Running");
+                    strcpy(currPro->state, "Running");
                 }
 
                 // Get the quantum time from the config
@@ -430,34 +427,30 @@ void runRR_P(struct PCB * programPCBs, int numPrograms, struct Config config)
                 // Run the program for the quantum time
                 while (remCycles > 0)
                 {
-
-                    // Get the current action
-                    currAct = programPCBs[count].program[progress[count]];
-
                     // Run the action
-                    runAction(&programPCBs[count], &currAct, config);
+                    runAction(currPro, currPro->program, config);
 
-                    while (strcmp(programPCBs[count].state, "Blocked") == 0)
+                    while (strcmp(currPro->state, "Blocked") == 0)
                     {
                       //Wait until not blocked.
                     }
 
                     // If its not a memory operation, subtract its cycle time
-                    if (currAct.comLetter != 'M')
+                    if (currPro->program->comLetter != 'M')
                     {
-                        remCycles -= currAct.cycleTime;
+                        remCycles -= currPro->program->cycleTime;
                     }
 
                     // If end of program is reached set remaining cycles to zero
-                    if (strcmp(currAct.opString, "end") == 0)
+                    if (strcmp(currPro->program->opString, "end") == 0)
                     {
                         remCycles = 0;
                     }
 
-                    // Add one to the progress counter for this program
-                    progress[count] += 1;
+                    // Go to next action
+                    currPro->program = currPro->program->nextAction;
 
-                    if (strcmp(programPCBs[count].state, "Blocked") == 0)
+                    if (strcmp(currPro->state, "Blocked") == 0)
                     {
                       break;
                     }
@@ -465,26 +458,32 @@ void runRR_P(struct PCB * programPCBs, int numPrograms, struct Config config)
                 }
 
                 // If the program didn't finish, place it into ready state
-                if (strcmp(programPCBs[count].state, "Exit") != 0)
+                if (strcmp(currPro->state, "Exit") != 0)
                 {
                     memset(outputStr, '\0', 128);
 
                     strcat(outputStr, outputTime(config));
                     strcat(outputStr, " OS:");
-                    strcat(outputStr, outputProcessNum(config, intToString(currAct.processNum)));
+                    strcat(outputStr, outputProcessNum(config, intToString(currPro->processNum)));
                     strcat(outputStr, "set in Ready state\n");
                     output(config, outputStr);
 
                     // Set the process back into ready state after its time is up
-                    strcpy(programPCBs[count].state, "Ready");
+                    strcpy(currPro->state, "Ready");
                 }
 
                 output(config, "\n");
 
             }
-
+            currPro = currPro->nextPCB;
         }
 
+
+        while ((firstPro != NULL) && (strcmp(firstPro->state, "Exit") == 0))
+        {
+            firstPro = firstPro->nextPCB;
+        }
+        currPro = firstPro;
     }
 
 }
@@ -503,8 +502,6 @@ void runAction(struct PCB * currPro, struct Action * currAct, struct Config conf
     int waitNum;
     pthread_t thread;
     struct ThreadStruct * threadStruct = (struct ThreadStruct *) malloc(sizeof(struct ThreadStruct));
-
-//    printf("RUNNING ACTION: %c, %s, %d\n", currAct->comLetter, currAct->opString, currAct->cycleTime);
 
     threadStruct->currPro = currPro;
     threadStruct->currAct = *currAct;
