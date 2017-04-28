@@ -36,10 +36,11 @@ struct Config
 // Structure used to hold all the information relating to a single program
 struct PCB
 {
-
+    int    processNum;
     char   state[16];
     int    numActions;
     struct Action * program;
+    struct PCB * prevPCB;
     struct PCB * nextPCB;
 };
 
