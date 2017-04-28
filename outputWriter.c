@@ -1,8 +1,8 @@
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include "timer.h"
-#include "structures.h"
+// Precompiler directives ////////////////////////
+#ifndef OUT_C
+#define OUT_C
+
+#include "outputWriter.h"
 
 /*
  *  Name:        output
@@ -116,3 +116,5 @@ char * outputTime(struct Config config)
 
     return returnStr;
 }
+
+#endif

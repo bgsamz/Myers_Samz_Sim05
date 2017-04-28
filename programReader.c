@@ -1,12 +1,8 @@
-#include <stdio.h>  // I/O
-#include <stdlib.h> // Malloc
-#include <string.h> // String Operations
-#include "structures.h"
-#include "helperFunctions.h"
+// Precompiler directives ////////////////////////
+#ifndef PRGREAD_C
+#define PRGREAD_C
 
-// Function Declarations
-char * getNextAction(char * line);
-int createAction(char * string, struct Action * data);
+#include "programReader.h"
 
 /*
  *  Name:        readProgram
@@ -201,3 +197,5 @@ int createAction(char * string, struct Action * data)
     return 0;
 
 }
+
+#endif

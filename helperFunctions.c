@@ -1,6 +1,8 @@
-#include <stdlib.h> // Malloc
-#include <string.h> // String Operations
-#include "structures.h"
+// Precompiler directives ////////////////////////
+#ifndef HELP_C
+#define HELP_C
+
+#include "helperFunctions.h"
 
 /*
  *  Name:        findChar
@@ -133,3 +135,5 @@ char * substring(char * string, int start, int end)
     return newString;
 
 }
+
+#endif

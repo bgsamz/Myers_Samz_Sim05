@@ -1,4 +1,8 @@
-#include <stdio.h> // I/O
+// Precompiler directives ////////////////////////
+#ifndef ERR_C
+#define ERR_C
+
+#include "errors.h"
 
 /*
  *  Name:        reportError
@@ -168,3 +172,5 @@ void reportError(int code)
     printf("\n");
 
 }
+
+#endif
