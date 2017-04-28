@@ -87,48 +87,10 @@ void runFCFS_N(struct PCB * programPCBs, int numPrograms, struct Config config)
  */
 void runSJF_N(struct PCB * programPCBs, int numPrograms, struct Config config)
 {
-
-    int count, swap, saveNum;
-    struct PCB tempProgram;
-
-    // Save the number of programs, since bubble sort will reduce it
-    saveNum = numPrograms;
-
-    // Initialize swap to true
-    swap = 1;
-
-    // While Swaps are still occuring, sort
-    while (swap == 1)
-    {
-
-    // Assume no swap has been made yet
-    swap = 0;
-
-        // Loop through each program and swap if necessary
-        for (count = 0; count < numPrograms - 1; count++)
-        {
-
-            if (getProgramLength(programPCBs[count]) >
-                getProgramLength(programPCBs[count + 1]))
-            {
-
-                tempProgram = programPCBs[count];
-                programPCBs[count] = programPCBs[count + 1];
-                programPCBs[count + 1] = tempProgram;
-
-                // If a swap occurs, set swap to true
-                swap = 1;
-
-            }
-
-        }
-
-        numPrograms--;
-
-    }
+    sortPCB( programPCBs, numPrograms, config );
 
     // Now that the programs are sorted, run them like FCFS-N
-    runFCFS_N(programPCBs, saveNum, config);
+    runFCFS_N(programPCBs, numPrograms, config);
 
 }
 
@@ -643,6 +605,50 @@ int getProgramLength(struct PCB pcb)
     // Return the counted number of cycles
     return numCycles;
 
+}
+
+//---------------------------
+// #2 Sort PCB using a linked 
+// list structure
+//---------------------------
+void sortPCB( struct PCB * programPCBs, int numPrograms, struct Config config )
+{
+    int count;
+    struct PCB * tempProgram;
+    struct PCB * currPro = programPCBs;
+
+    if(numPrograms == 1)
+    {
+        return;
+    }
+
+    // Loop through each program and swap if necessary
+    if (getProgramLength(*currPro) >
+            getProgramLength(*currPro->nextPCB))
+    {
+
+        tempProgram = currPro->nextPCB;
+        currPro->nextPCB = tempProgram->nextPCB;
+        tempProgram->prevPCB = currPro->prevPCB;
+        currPro->prevPCB = tempProgram;
+        tempProgram->nextPCB = currPro;
+
+        if ( tempProgram->prevPCB != NULL )
+        {
+            tempProgram->prevPCB->nextPCB = tempProgram;
+        }
+
+        currPro = tempProgram->nextPCB;
+
+    }
+    else
+    {
+        currPro = currPro->nextPCB;
+    }
+
+    numPrograms--;
+    
+    sortPCB(currPro, numPrograms, config);
 }
 
 #endif

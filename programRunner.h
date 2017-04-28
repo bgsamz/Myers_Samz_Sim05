@@ -28,5 +28,6 @@ void runRR_P(struct PCB * programPCBs, int numPrograms, struct Config config);
 void runAction(struct PCB * currPro, struct Action * currAct, struct Config config);
 void sortPrograms(struct Config config, struct PCB * programs, int numPrograms);
 int getProgramLength(struct PCB pcb);
+void sortPCB( struct PCB * programPCBs, int numPrograms, struct Config config );
 
 #endif
