@@ -1,12 +1,8 @@
-#include <sys/time.h> // Time of day
-#include <stdio.h>    // SprintF
-#include <string.h>
-#include <stdlib.h>   // Malloc
-#include "helperFunctions.h"
-#include "outputWriter.h"
-#include "structures.h"
+// Precompiler directives ////////////////////////
+#ifndef TIMER_C
+#define TIMER_C
 
-char * systemTime(int code);
+#include "timer.h"
 
 /*
  *  Name:        wait
@@ -166,3 +162,5 @@ char * systemTime(int code)
     }
 
 }
+
+#endif

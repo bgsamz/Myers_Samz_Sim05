@@ -1,8 +1,8 @@
-#include <stdio.h>  // I/O
-#include <stdlib.h> // Malloc
-#include <string.h> // String Operations
-#include "structures.h"
-#include "helperFunctions.h"
+// Precompiler directives ////////////////////////
+#ifndef CFG_C
+#define CFG_C
+
+#include "configReader.h"
 
  /*
   *  Name:        readConfig
@@ -244,3 +244,5 @@ int readConfig(char * fileName, struct Config * data)
     return 0;
 
 }
+
+#endif
